@@ -1,0 +1,34 @@
+{
+    "name": "Hammurabi Dev Conatainer",
+    "build": {
+        "dockerfile": "Dockerfie"
+    },
+    "features": {
+        "ghcr.io/devcontainers/features/common-utils:2": {}
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "rust-lang.rust-analyzer",
+                "ms-python.python",
+                "ms-python.vscode-pylance",
+                "tamasfe.even-better-toml",
+                "ethinvaz.z3-explorer",
+                "bungcip.better-toml"
+            ],
+            "settings": {
+                "python.defaultInterpreterPath": "/usr/local/bin/python3",
+                "rust-analyzer.cargo.unsetTest": ["hammurabi-py"],
+                "rust-analyzer.linkedProjects": [
+                    "hammurabi-py/Cargo.toml",
+                    "hammurabi-core/Cargo.toml"
+                ]
+            }
+        }
+    },
+    "remoteUser": "vscode",
+    "mounts": [
+        "source=${localWorkspaceFolder}, target=/workspace/hammurabi, type=bind, consistency=cached"
+    ],
+    "postCreateCommand": "rustup default stable"
+}
