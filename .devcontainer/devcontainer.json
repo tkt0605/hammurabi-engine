@@ -1,7 +1,7 @@
 {
     "name": "Hammurabi Dev Conatainer",
     "build": {
-        "dockerfile": "Dockerfie"
+        "dockerfile": "Dockerfile"
     },
     "features": {
         "ghcr.io/devcontainers/features/common-utils:2": {}
@@ -17,7 +17,7 @@
                 "bungcip.better-toml"
             ],
             "settings": {
-                "python.defaultInterpreterPath": "/usr/local/bin/python3",
+                "python.defaultInterpreterPath": "/workspaces/hammurabi-engine/.venv/bin/python",
                 "rust-analyzer.cargo.unsetTest": ["hammurabi-py"],
                 "rust-analyzer.linkedProjects": [
                     "hammurabi-py/Cargo.toml",
@@ -27,8 +27,14 @@
         }
     },
     "remoteUser": "vscode",
-    "mounts": [
-        "source=${localWorkspaceFolder}, target=/workspace/hammurabi, type=bind, consistency=cached"
+    "workspaceFolder": "/workspaces/hammurabi-engine",
+    "postCreateCommand": [
+        "[ -d .venv ] || uv venv .venv",
+        "cd /workspaces/hammurabi-engine && uv sync",
+        "rustup default stable || true",
+        "rustup component add rustfmt clippy || true"
     ],
-    "postCreateCommand": "rustup default stable"
+    "remoteEnv": {
+        "PATH": "/workspaces/hammurabi-engine/.venv/bin:${containerEnv:PATH}"
+    }
 }
