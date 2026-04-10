@@ -1,5 +1,9 @@
-./.venv
-.hammurabi_py/__pycache__/
-.hammurabi_py/**/__pycache__/
+.venv/
+__pycache__/
+db.sqlite3
+*.pyc
+*.pyo
+*.pyd
 .env
-./hammurabi_py/db.sqlite3
+.DS_Store
+.vscode/
