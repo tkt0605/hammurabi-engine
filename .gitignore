@@ -1,8 +1,5 @@
 ./.venv
-./hammurabi_py/__pycache__/
-./hammurabi_py/config/__pycache__/
-./hammurabi_py/api/__pycache__/
-# ./hammurabi_py/config/settings.py
-# ./hammurabi_py/config/urls.py
-# ./hammurabi_py/api/urls.py
-# ./hammurabi_py/api/views.py
+.hammurabi_py/__pycache__/
+.hammurabi_py/**/__pycache__/
+.env
+./hammurabi_py/db.sqlite3
