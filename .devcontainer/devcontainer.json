@@ -36,5 +36,6 @@
     ],
     "remoteEnv": {
         "PATH": "/workspaces/hammurabi-engine/.venv/bin:${containerEnv:PATH}"
-    }
+    },
+    "forwardPorts": [8000]
 }

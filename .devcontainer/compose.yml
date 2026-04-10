@@ -1,0 +1,19 @@
+# version: '3.8'
+
+# services:
+#   dev:
+#     build:
+#       context: ..
+#       dockerfile: .devcontainer/Dockerfile
+#     container_name: hammurabi-engine-dev
+#     volumes:
+#       - ..:/workspace
+#     working_dir: /workspace
+#     environment:
+#       - NODE_ENV=development
+#     ports:
+#       - "3000:3000"
+#       - "5173:5173"
+#     stdin_open: true
+#     tty: true
+#     command: /bin/bash
