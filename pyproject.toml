@@ -16,3 +16,5 @@ dependencies = [
 ]
 [tool.pytest.ini_options]
 pythonpath = ["."]
+DJANGO_SETTINGS_MODULE = "hammurabi_py.settings"
+

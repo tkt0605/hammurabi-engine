@@ -1,11 +1,6 @@
-import os
-import django
 import pytest
 from hammurabi_py.core.engine import HammurabiEngine
 from hammurabi_py.core.types import EvaluationContext
-
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "hammurabi_py.settings")
-django.setup()
 
 def test_admin_allow_rule():
     policies = [{
@@ -45,3 +40,32 @@ def test_invalid_rule():
             resource_id="post_123",
             attributes={}
         ), "x")
+
+def test_non_admin_deny_rule():
+    """非adminユーザーは allow されないことを確認"""
+    policies = [{
+        "policy": "edit_policy",
+        "rules": [{"if": "user.role == 'admin'", "allow": True}]
+    }]
+    engine = HammurabiEngine(policies=policies)
+    context = EvaluationContext(
+        user_id="2",
+        action="edit",
+        resource_id="post_123",
+        attributes={"user": {"role": "user"}}
+    )
+    result = engine.evaluate(context, "edit_policy")
+    assert result.allowed is False
+
+def test_policy_not_found():
+    """存在しないポリシー名を指定した場合、allowed=False かつ reason に 'not found' を含む"""
+    engine = HammurabiEngine(policies=[])
+    context = EvaluationContext(
+        user_id="1",
+        action="edit",
+        resource_id="post_123",
+        attributes={}
+    )
+    result = engine.evaluate(context, "nonexistent_policy")
+    assert result.allowed is False
+    assert result.reason is not None and "not found" in result.reason

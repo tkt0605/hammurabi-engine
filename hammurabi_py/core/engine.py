@@ -29,6 +29,7 @@ class HammurabiEngine:
                     rule_id=f"{policy_name}_rule_{idx}",
                     trace=trace
                 )
+            # 条件不一致の場合は次のルールへ継続
         return EvaluationResult(allowed=False, reason="No rules matched", trace=trace)
     def _check_condition(self, condition: str, context: EvaluationContext) -> bool:
         """
