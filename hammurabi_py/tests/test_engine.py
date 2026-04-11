@@ -11,7 +11,10 @@ def test_admin_allow_rule():
     policies = [{
         "policy": "edit_policy",
         "rules": [
-            {"if": "user.role == 'admin'", "allow": True},
+            {
+                "if": "user.role == 'admin'",
+                "allow": True
+            },
         ]
     }]
     engine = HammurabiEngine(policies=policies)
@@ -25,41 +28,20 @@ def test_admin_allow_rule():
             }
         }
     )
+    ## policyのルールの名前を取得している。「edit_policy」を取得中
     result = engine.evaluate(context, "edit_policy")
     assert result.allowed is True
     assert result.rule_id == "edit_policy_rule_0"
+    ## ここも問題
     assert any(t.passed for t in result.trace) is True
-
-def test_engine_evaluation():
-    policies = [
-        {
-            "policy": "test_policy",
-            "rules": [
-                {"condition": "user['role'] == 'admin'", "allow": True},
-                {"condition": "user['role'] == 'user'", "allow": False}
-            ]
-        }
-    ]
-    engine = HammurabiEngine(policies=policies)
     
-    context_admin = EvaluationContext(
-        user_id="1",
-        action="read",
-        resource_id="res1",
-        attributes={"user": {"role": "admin"}}
-    )
-    result_admin = engine.evaluate(context_admin, "test_policy")
-    assert result_admin.allowed == True
-    assert len(result_admin.trace) == 1
-    assert result_admin.trace[0].passed == True
-    
-    context_user = EvaluationContext(
-        user_id="2",
-        action="read",
-        resource_id="res1",
-        attributes={"user": {"role": "user"}}
-    )
-    result_user = engine.evaluate(context_user, "test_policy")
-    assert result_user.allowed == False
-    assert len(result_user.trace) == 1
-    assert result_user.trace[0].passed == False
+def test_invalid_rule():
+    policies = [{"policy": "x", "rules": [{}]}]
+    engine = HammurabiEngine(policies)
+    with pytest.raises(Exception):
+        engine.evaluate(EvaluationContext(
+            user_id="1",
+            action="edit",
+            resource_id="post_123",
+            attributes={}
+        ), "x")

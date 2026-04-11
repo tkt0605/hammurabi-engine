@@ -1,6 +1,6 @@
 from typing import Any, Dict, List, Optional, Tuple, Union
 from pydantic import BaseModel, Field
-
+import dataclasses
 class EvaluationContext(BaseModel):
     user_id: str
     action: str
@@ -19,3 +19,10 @@ class EvaluationResult(BaseModel):
     rule_id: Optional[str] = None
     trace: List[TraceNode] = Field(default_factory=list)
     confidence: float = 1.0
+
+class PolicyRule(BaseModel):
+    condition_if: str = Field(..., alias="if")
+    allow: bool
+class PolicyDefinition(BaseModel):
+    policy: str
+    rules: List[PolicyRule]

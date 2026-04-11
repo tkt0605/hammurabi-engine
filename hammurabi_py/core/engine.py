@@ -13,7 +13,9 @@ class HammurabiEngine:
             return EvaluationResult(allowed=False, reason=f"Policy '{policy_name}' not found")
         trace = []
         for idx, rule in enumerate(policy["rules"]):
-            condition = rule["condition"]
+            condition = rule.get("if")
+            if not condition:
+                raise ValueError(f"Rule {idx} in policy '{policy_name}' must have an 'if' condition")
             is_match = self._check_condition(condition, context)
             trace.append(TraceNode(
                 rule_id=f"{policy_name}_rule_{idx}",
@@ -21,7 +23,7 @@ class HammurabiEngine:
                 passed=is_match,
                 message="Condition met" if is_match else "Condition not met"
             ))
-            if not is_match:
+            if is_match:
                 return EvaluationResult(
                     allowed=rule["allow"],
                     rule_id=f"{policy_name}_rule_{idx}",
@@ -31,14 +33,23 @@ class HammurabiEngine:
     def _check_condition(self, condition: str, context: EvaluationContext) -> bool:
         """
         AIが生成しやすい、あるいはパースしやすいシンプルな条件評価
-        例: 'user.role == admin' -> context.attributes['role'] == 'admin'
+        例: 'user.role == "admin"' -> context.attributes['user']['role'] == 'admin'
+        dict をドット記法でアクセス可能にするため AttrDict でラップする。
         """
+        class AttrDict(dict):
+            def __getattr__(self, key: str):
+                try:
+                    val = self[key]
+                    return AttrDict(val) if isinstance(val, dict) else val
+                except KeyError:
+                    raise AttributeError(key)
+
         try:
             scope = {
-                "user": context.attributes.get("user", {}),
-                "resource": context.attributes.get("resource", {}),
+                "user": AttrDict(context.attributes.get("user", {})),
+                "resource": AttrDict(context.attributes.get("resource", {})),
                 "id": context.user_id
             }
-            return eval(condition, {"__builtins__": {}}, scope)
-        except Exception as e:
+            return bool(eval(condition, {"__builtins__": {}}, scope))
+        except Exception:
             return False
